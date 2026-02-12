@@ -1,0 +1,187 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>Bile acids – interactive 3D (JSmol)</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <script src="jsmol/JSmol.min.js"></script>
+
+  <style>
+    body { font-family: Arial, sans-serif; margin: 18px; line-height: 1.35; }
+    .container { max-width: 980px; position: relative; }
+
+    h2 { margin: 0 0 10px 0; font-size: 20px; }
+
+    .viewerFrame {
+      width: 900px;
+      max-width: 100%;
+      height: 520px;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      overflow: hidden;
+      background: #fff;
+      position: relative;
+      z-index: 1;
+    }
+
+    .toolbar {
+      margin-top: 10px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+      position: relative;
+      z-index: 9999;
+    }
+
+    button, select {
+      padding: 7px 11px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      background: #f8f8f8;
+      cursor: pointer;
+      user-select: none;
+      font-size: 14px;
+    }
+    button:hover, select:hover { background: #efefef; }
+
+    .label { font-size: 14px; color: #333; margin-right: 4px; }
+
+    #app_popupmenu_top_1 { pointer-events: none; }
+    #app_popupmenu_top_1[style*="display: block"] { pointer-events: auto; }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <h2>Bile acids – interactive 3D</h2>
+
+    <div class="viewerFrame" id="viewerFrame">
+      <script>
+        var VIEW_W = 900;
+        var VIEW_H = 520;
+
+        window.MOLS = {
+          "CA (cholic acid)":        "CA_freeacid_MM2.sdf",
+          "CDCA (chenodeoxycholic)": "CDCA_freeacid_MM2.sdf",
+          "DCA (deoxycholic acid)":  "DCA_freeacid_MM2.sdf",
+          "GCA (glycocholic acid)":  "GCA_freeacid_MM2.sdf",
+          "TCA (taurocholic acid)":  "TCA_freeacid_MM2.sdf",
+          "LCA (lithocholic acid)":  "LCA_freeacid_MM2.sdf",
+          "UDCA (ursodeoxycholic)":  "UDCA_freeacid_MM2.sdf",
+          "OCA (obeticholic acid)":  "OCA_freeacid_MM2.sdf"
+        };
+
+        window.currentLabel = "CA (cholic acid)";
+        window.currentFile  = window.MOLS[window.currentLabel];
+        window.hOn = true;
+
+        window.Info = {
+          width: VIEW_W,
+          height: VIEW_H,
+          use: "HTML5",
+          j2sPath: "jsmol/j2s",
+          disableJ2SLoadMonitor: true,
+          disableInitialConsole: true,
+          script:
+            "load " + window.currentFile + ";" +
+            "set background white;" +
+            "set antialiasDisplay true;" +
+            "select all; wireframe 0.12; spacefill 23%;" +
+            "zoomto 1.2 {*} ; rotate best; center;"
+        };
+
+        window.app = Jmol.getApplet("app", window.Info);
+        document.write(Jmol.getAppletHtml(window.app));
+      </script>
+    </div>
+
+    <div class="toolbar">
+      <span class="label">Molecule:</span>
+      <select id="molSelect" onchange="loadSelectedMolecule()">
+        <option>CA (cholic acid)</option>
+        <option>CDCA (chenodeoxycholic)</option>
+        <option>DCA (deoxycholic acid)</option>
+        <option>GCA (glycocholic acid)</option>
+        <option>TCA (taurocholic acid)</option>
+        <option>LCA (lithocholic acid)</option>
+        <option>UDCA (ursodeoxycholic)</option>
+        <option>OCA (obeticholic acid)</option>
+      </select>
+
+      <button type="button" onclick="Jmol.script(window.app,'select all; spacefill 23%; wireframe 0.12;')">Ball &amp; Stick</button>
+      <button type="button" onclick="Jmol.script(window.app,'select all; spacefill off; wireframe 0.20;')">Sticks</button>
+      <button type="button" onclick="Jmol.script(window.app,'select all; spacefill 100%; wireframe off;')">Spacefill</button>
+
+      <button type="button" id="hBtn" onclick="toggleHydrogens()">Hydrogens: ON</button>
+
+      <button type="button" onclick="resetView()">Reset view</button>
+
+      <button type="button" onclick="exportPNG()">Snapshot / Export PNG</button>
+    </div>
+  </div>
+
+  <script>
+    function applyCommonView() {
+      return (
+        "set background white;" +
+        "set antialiasDisplay true;" +
+        "select all; wireframe 0.12; spacefill 23;" +
+        "zoomto 1.2 {*} ; rotate best; center;" +
+        (window.hOn ? "set showHydrogens true;" : "set showHydrogens false;")
+      );
+    }
+
+    function loadSelectedMolecule() {
+      var label = document.getElementById("molSelect").value;
+      window.currentLabel = label;
+      window.currentFile = window.MOLS[label];
+      Jmol.script(window.app, "load " + window.currentFile + ";" + applyCommonView());
+    }
+
+    function toggleHydrogens() {
+      window.hOn = !window.hOn;
+      Jmol.script(window.app, window.hOn ? "set showHydrogens true;" : "set showHydrogens false;");
+      document.getElementById("hBtn").innerText = "Hydrogens: " + (window.hOn ? "ON" : "OFF");
+    }
+
+    function resetView() {
+      Jmol.script(window.app, "load " + window.currentFile + ";" + applyCommonView());
+    }
+
+    // --- FIXED Snapshot / Export PNG ---
+    function exportPNG() {
+      // Ask JSmol for an image snapshot as a Base64 string (often returned WITHOUT a data: prefix)
+      Jmol.script(window.app, "refresh;");
+      var s = Jmol.getPropertyAsString(window.app, "image");
+
+      if (!s || typeof s !== "string") {
+        alert("Snapshot export failed (empty response). Try again after rotating/zooming once.");
+        return;
+      }
+
+      // Some builds return a full data URL; others return only the base64 payload.
+      var dataUrl = s.trim();
+      if (!dataUrl.startsWith("data:image")) {
+        // Standard pattern: data:image/png;base64, + base64payload :contentReference[oaicite:1]{index=1}
+        dataUrl = "data:image/png;base64," + dataUrl;
+      }
+
+      if (!dataUrl.startsWith("data:image/png;base64,")) {
+        alert("Snapshot export returned an unexpected format.");
+        return;
+      }
+
+      var safeName = (window.currentLabel || "molecule").replace(/[^a-z0-9]+/gi, "_");
+      var filename = safeName + "_snapshot.png";
+
+      var a = document.createElement("a");
+      a.href = dataUrl;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+    }
+  </script>
+</body>
+</html>
