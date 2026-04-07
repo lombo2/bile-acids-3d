@@ -62,14 +62,25 @@
         var VIEW_H = 520;
 
         window.MOLS = {
-          "CA (cholic acid)":        "CA_freeacid_MM2.sdf",
-          "CDCA (chenodeoxycholic)": "CDCA_freeacid_MM2.sdf",
-          "DCA (deoxycholic acid)":  "DCA_freeacid_MM2.sdf",
-          "GCA (glycocholic acid)":  "GCA_freeacid_MM2.sdf",
-          "TCA (taurocholic acid)":  "TCA_freeacid_MM2.sdf",
-          "LCA (lithocholic acid)":  "LCA_freeacid_MM2.sdf",
-          "UDCA (ursodeoxycholic)":  "UDCA_freeacid_MM2.sdf",
-          "OCA (obeticholic acid)":  "OCA_freeacid_MM2.sdf"
+          "CA (cholic acid)":                          "CA_freeacid_MM2.sdf",
+          "CDCA (chenodeoxycholic acid)":              "CDCA_freeacid_MM2.sdf",
+          "DCA (deoxycholic acid)":                    "DCA_freeacid_MM2.sdf",
+          "GCA (glycocholic acid)":                    "GCA_freeacid_MM2.sdf",
+          "TCA (taurocholic acid)":                    "TCA_freeacid_MM2.sdf",
+          "LCA (lithocholic acid)":                    "LCA_freeacid_MM2.sdf",
+          "UDCA (ursodeoxycholic acid)":               "UDCA_freeacid_MM2.sdf",
+          "OCA (obeticholic acid)":                    "OCA_freeacid_MM2.sdf",
+
+          "GCDCA (glycochenodeoxycholic acid)":        "GCDCA_freeacid_MM2.sdf",
+          "TCDCA (taurochenodeoxycholic acid)":        "TCDCA_freeacid_MM2.sdf",
+          "GDCA (glycodeoxycholic acid)":              "GDCA_freeacid_MM2.sdf",
+          "TDCA (taurodeoxycholic acid)":              "TDCA_freeacid_MM2.sdf",
+          "GLCA (glycolithocholic acid)":              "GLCA_freeacid_MM2.sdf",
+          "TLCA (taurolithocholic acid)":              "TLCA_freeacid_MM2.sdf",
+          "GOCA (glyco-obeticholic acid)":             "GOCA_freeacid_MM2.sdf",
+          "TOCA (tauro-obeticholic acid)":             "TOCA_freeacid_MM2.sdf",
+          "GUDCA (glycoursodeoxycholic acid)":         "GUDCA_freeacid_MM2.sdf",
+          "TUDCA (tauroursodeoxycholic acid)":         "TUDCA_freeacid_MM2.sdf"
         };
 
         window.currentLabel = "CA (cholic acid)";
@@ -100,13 +111,24 @@
       <span class="label">Molecule:</span>
       <select id="molSelect" onchange="loadSelectedMolecule()">
         <option>CA (cholic acid)</option>
-        <option>CDCA (chenodeoxycholic)</option>
+        <option>CDCA (chenodeoxycholic acid)</option>
         <option>DCA (deoxycholic acid)</option>
         <option>GCA (glycocholic acid)</option>
         <option>TCA (taurocholic acid)</option>
         <option>LCA (lithocholic acid)</option>
-        <option>UDCA (ursodeoxycholic)</option>
+        <option>UDCA (ursodeoxycholic acid)</option>
         <option>OCA (obeticholic acid)</option>
+
+        <option>GCDCA (glycochenodeoxycholic acid)</option>
+        <option>TCDCA (taurochenodeoxycholic acid)</option>
+        <option>GDCA (glycodeoxycholic acid)</option>
+        <option>TDCA (taurodeoxycholic acid)</option>
+        <option>GLCA (glycolithocholic acid)</option>
+        <option>TLCA (taurolithocholic acid)</option>
+        <option>GOCA (glyco-obeticholic acid)</option>
+        <option>TOCA (tauro-obeticholic acid)</option>
+        <option>GUDCA (glycoursodeoxycholic acid)</option>
+        <option>TUDCA (tauroursodeoxycholic acid)</option>
       </select>
 
       <button type="button" onclick="Jmol.script(window.app,'select all; spacefill 23%; wireframe 0.12;')">Ball &amp; Stick</button>
@@ -149,9 +171,7 @@
       Jmol.script(window.app, "load " + window.currentFile + ";" + applyCommonView());
     }
 
-    // --- FIXED Snapshot / Export PNG ---
     function exportPNG() {
-      // Ask JSmol for an image snapshot as a Base64 string (often returned WITHOUT a data: prefix)
       Jmol.script(window.app, "refresh;");
       var s = Jmol.getPropertyAsString(window.app, "image");
 
@@ -160,10 +180,8 @@
         return;
       }
 
-      // Some builds return a full data URL; others return only the base64 payload.
       var dataUrl = s.trim();
       if (!dataUrl.startsWith("data:image")) {
-        // Standard pattern: data:image/png;base64, + base64payload :contentReference[oaicite:1]{index=1}
         dataUrl = "data:image/png;base64," + dataUrl;
       }
 
